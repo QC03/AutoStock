@@ -125,13 +125,15 @@
 ### 8단계 – 서버 배포 및 운영 환경 구축
 
 - [ ] 클라우드 서버 선택 (AWS EC2 / GCP / 자체 서버)
-- [ ] Docker 이미지 빌드 및 컨테이너 레지스트리 푸시 (Docker Hub / ECR)
-- [ ] 운영 환경 환경변수 관리 (`.env.production`, AWS Secrets Manager 등)
-- [ ] Nginx 리버스 프록시 설정 (HTTPS, SSL 인증서)
-- [ ] CI/CD 파이프라인 구성 (GitHub Actions → 자동 빌드·테스트·배포)
-- [ ] 운영 DB 마이그레이션 (PostgreSQL 운영 서버)
-- [ ] 모니터링 및 알림 설정 (Prometheus + Grafana 또는 CloudWatch)
+- [x] Docker 이미지 빌드 및 컨테이너 레지스트리 푸시 파이프라인 템플릿 (GHCR, `.github/workflows/stage8-cicd.yml`)
+- [x] 운영 환경 환경변수 템플릿 (`infra/.env.production.example`)
+- [x] Nginx 리버스 프록시 설정 템플릿 (`infra/nginx/autostock.prod.conf`)
+- [x] CI/CD 파이프라인 구성 (GitHub Actions + SSH 자동배포)
+- [x] 운영 DB 마이그레이션 스크립트 (`infra/scripts/migrate_prod.sh`)
+- [x] 모니터링 기본 구성 (Prometheus + Grafana + `/metrics`)
 - [ ] 로그 수집 (ELK Stack 또는 클라우드 로그 서비스)
+
+> 배포 상세 절차: `docs/STAGE8_DEPLOYMENT.md`
 
 ---
 
