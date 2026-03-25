@@ -1,7 +1,15 @@
 from app.schemas.auth import LoginRequest, SignupRequest, TokenResponse
 from app.schemas.dashboard import PerformanceResponse, PortfolioResponse, TradeHistoryItem
 from app.schemas.data import IndicatorResponse, QuoteResponse, SymbolItem
-from app.schemas.trading import AutoTradeToggleRequest, AutoTradeToggleResponse, OrderCreateRequest, OrderResponse
+from app.schemas.trading import (
+    AutoTradeActivityResponse,
+    AutoTradeConfigRequest,
+    AutoTradeConfigResponse,
+    AutoTradeToggleRequest,
+    AutoTradeToggleResponse,
+    OrderCreateRequest,
+    OrderResponse,
+)
 
 __all__ = [
     "SignupRequest",
@@ -14,6 +22,9 @@ __all__ = [
     "OrderResponse",
     "AutoTradeToggleRequest",
     "AutoTradeToggleResponse",
+    "AutoTradeConfigRequest",
+    "AutoTradeConfigResponse",
+    "AutoTradeActivityResponse",
     "PortfolioResponse",
     "TradeHistoryItem",
     "PerformanceResponse",

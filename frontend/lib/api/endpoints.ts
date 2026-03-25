@@ -13,6 +13,14 @@ export type OrderPayload = {
   limit_price?: number;
 };
 
+export type AutoTradeConfigPayload = {
+  strategy: "rsi_macd" | "momentum" | "mean_reversion";
+  symbols: string[];
+  quantity: number;
+  interval_seconds: number;
+  max_loss_pct: number;
+};
+
 export const authApi = {
   signup: async (payload: LoginPayload) => {
     const { data } = await apiClient.post("/auth/signup", payload);
@@ -63,6 +71,42 @@ export const tradingApi = {
       price: number;
       status: string;
       reason: string;
+    };
+  },
+  getAutoTradeStatus: async (token: string | null) => {
+    const { data } = await apiClient.get("/trading/auto-trade", {
+      headers: authHeaders(token),
+    });
+    return data as { enabled: boolean };
+  },
+  getAutoTradeConfig: async (token: string | null) => {
+    const { data } = await apiClient.get("/trading/auto-trade/config", {
+      headers: authHeaders(token),
+    });
+    return data as AutoTradeConfigPayload;
+  },
+  setAutoTradeConfig: async (token: string | null, payload: AutoTradeConfigPayload) => {
+    const { data } = await apiClient.post("/trading/auto-trade/config", payload, {
+      headers: authHeaders(token),
+    });
+    return data as AutoTradeConfigPayload;
+  },
+  getAutoTradeActivity: async (token: string | null) => {
+    const { data } = await apiClient.get("/trading/auto-trade/activity", {
+      headers: authHeaders(token),
+    });
+    return data as {
+      enabled: boolean;
+      running: boolean;
+      strategy: string;
+      symbols: string[];
+      quantity: number;
+      interval_seconds: number;
+      last_run_at?: string | null;
+      last_action?: string | null;
+      last_symbol?: string | null;
+      last_signal?: string | null;
+      last_message?: string | null;
     };
   },
   toggleAutoTrade: async (token: string | null, enabled: boolean) => {

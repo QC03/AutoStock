@@ -7,11 +7,82 @@ from app.api.deps import get_current_user
 from app.core.database import get_db
 from app.models.trade import AutoTradeSetting, TradeOrder
 from app.models.user import User
-from app.schemas.trading import AutoTradeToggleRequest, AutoTradeToggleResponse, OrderCreateRequest, OrderResponse
+from app.schemas.trading import (
+    AutoTradeActivityResponse,
+    AutoTradeConfigRequest,
+    AutoTradeConfigResponse,
+    AutoTradeToggleRequest,
+    AutoTradeToggleResponse,
+    OrderCreateRequest,
+    OrderResponse,
+)
+from app.services.auto_trade_runner import auto_trade_runner
 from app.services.trading_engine import OrderRequest, OrderSide, OrderType
 from app.services.trading_runtime import engine
 
 router = APIRouter(prefix="/trading", tags=["trading"])
+
+
+@router.get("/auto-trade", response_model=AutoTradeToggleResponse)
+def get_auto_trade_status(
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> AutoTradeToggleResponse:
+    setting = db.query(AutoTradeSetting).filter(AutoTradeSetting.user_id == user.id).first()
+    enabled = setting.enabled if setting is not None else False
+    auto_trade_runner.set_user_enabled(user.id, enabled)
+    return AutoTradeToggleResponse(enabled=enabled)
+
+
+@router.get("/auto-trade/config", response_model=AutoTradeConfigResponse)
+def get_auto_trade_config(
+    user: User = Depends(get_current_user),
+) -> AutoTradeConfigResponse:
+    config = auto_trade_runner.get_user_config(user.id)
+    return AutoTradeConfigResponse(**config)
+
+
+@router.post("/auto-trade/config", response_model=AutoTradeConfigResponse)
+def set_auto_trade_config(
+    payload: AutoTradeConfigRequest,
+    user: User = Depends(get_current_user),
+) -> AutoTradeConfigResponse:
+    config = auto_trade_runner.set_user_config(
+        user.id,
+        {
+            "strategy": payload.strategy,
+            "symbols": [symbol.upper() for symbol in payload.symbols],
+            "quantity": payload.quantity,
+            "interval_seconds": payload.interval_seconds,
+            "max_loss_pct": payload.max_loss_pct,
+        },
+    )
+    return AutoTradeConfigResponse(**config)
+
+
+@router.get("/auto-trade/activity", response_model=AutoTradeActivityResponse)
+def get_auto_trade_activity(
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> AutoTradeActivityResponse:
+    setting = db.query(AutoTradeSetting).filter(AutoTradeSetting.user_id == user.id).first()
+    enabled = setting.enabled if setting is not None else False
+    auto_trade_runner.set_user_enabled(user.id, enabled)
+    activity = auto_trade_runner.get_user_activity(user.id)
+    config = auto_trade_runner.get_user_config(user.id)
+    return AutoTradeActivityResponse(
+        enabled=enabled,
+        running=activity["running"],
+        strategy=config["strategy"],
+        symbols=config["symbols"],
+        quantity=config["quantity"],
+        interval_seconds=config["interval_seconds"],
+        last_run_at=activity["last_run_at"],
+        last_action=activity["last_action"],
+        last_symbol=activity["last_symbol"],
+        last_signal=activity["last_signal"],
+        last_message=activity["last_message"],
+    )
 
 
 @router.post("/orders", response_model=OrderResponse)
@@ -77,4 +148,5 @@ def toggle_auto_trade(
         setting.enabled = payload.enabled
 
     db.commit()
+    auto_trade_runner.set_user_enabled(user.id, payload.enabled)
     return AutoTradeToggleResponse(enabled=payload.enabled)

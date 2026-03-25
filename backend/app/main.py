@@ -6,6 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.api import api_router
 from app.core.config import settings
 from app.core.database import Base, engine
+from app.services.auto_trade_runner import auto_trade_runner
 import app.models  # noqa: F401
 
 
@@ -20,6 +21,16 @@ app.add_middleware(
     allow_headers=["*"],
 )
 app.include_router(api_router)
+
+
+@app.on_event("startup")
+def startup_event() -> None:
+    auto_trade_runner.start()
+
+
+@app.on_event("shutdown")
+def shutdown_event() -> None:
+    auto_trade_runner.stop()
 
 
 @app.get("/health")

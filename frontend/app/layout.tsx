@@ -16,9 +16,9 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     <html lang="ko">
       <body>
         <AppProviders>
-          <div className="mx-auto min-h-screen max-w-6xl p-4 md:p-8">
-            <header className="mb-6 space-y-3">
-              <h1 className="text-2xl font-bold">AutoStock</h1>
+          <div className="mx-auto min-h-screen max-w-5xl p-4">
+            <header className="mb-6 border-b border-slate-200 pb-3">
+              <h1 className="mb-2 text-xl font-semibold">AutoStock</h1>
               <AppNav />
             </header>
             {children}
