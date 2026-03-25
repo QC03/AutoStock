@@ -1,6 +1,6 @@
 # Backend (FastAPI)
 
-현재는 4단계(자동매매 엔진 MVP)까지의 백엔드 기초 구성이 포함됩니다.
+현재는 5단계(백엔드 API 서버 MVP)까지의 백엔드 기초 구성이 포함됩니다.
 
 - `app/api`: 라우터
 - `app/models`: DB 모델
@@ -81,4 +81,40 @@ celery -A app.services.trading_scheduler.celery_app worker --loglevel=INFO
 ```powershell
 cd backend
 celery -A app.services.trading_scheduler.celery_app beat --loglevel=INFO
+```
+
+## 5단계 백엔드 API 서버 (MVP)
+
+### FastAPI 실행
+
+```powershell
+cd backend
+uvicorn app.main:app --reload
+```
+
+### 주요 API
+
+- 인증: `POST /auth/signup`, `POST /auth/login` (JWT)
+- 데이터: `GET /data/search`, `GET /data/quote/{symbol}`, `GET /data/indicators/{symbol}`
+- 매매: `POST /trading/orders`, `POST /trading/auto-trade`
+- 대시보드: `GET /dashboard/portfolio`, `GET /dashboard/trades`, `GET /dashboard/performance`
+
+### WebSocket
+
+- 실시간 시세 스트리밍: `ws://localhost:8000/ws/quotes/{symbol}`
+
+### Alembic 마이그레이션
+
+```powershell
+cd backend
+alembic upgrade head
+```
+
+초기 마이그레이션은 `alembic/versions/20260325_0001_init.py`입니다.
+
+### 테스트
+
+```powershell
+cd backend
+python -m pytest tests/test_api_stage5.py -q
 ```

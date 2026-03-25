@@ -85,15 +85,15 @@
 
 ### 5단계 – 백엔드 API 서버 구현
 
-- [ ] FastAPI 프로젝트 초기화
-- [ ] REST API 엔드포인트 설계
+- [x] FastAPI 프로젝트 초기화
+- [x] REST API 엔드포인트 설계
   - 인증: 회원가입 / 로그인 (JWT)
   - 데이터: 종목 검색, 시세 조회, 지표 조회
   - 매매: 수동 주문 실행, 자동매매 ON/OFF
   - 대시보드: 포트폴리오 현황, 매매 내역, 수익률
-- [ ] 데이터베이스 모델 정의 (SQLAlchemy + Alembic 마이그레이션)
-- [ ] WebSocket 실시간 시세 스트리밍
-- [ ] 단위 테스트 작성 (pytest)
+- [x] 데이터베이스 모델 정의 (SQLAlchemy + Alembic 마이그레이션)
+- [x] WebSocket 실시간 시세 스트리밍
+- [x] 단위 테스트 작성 (pytest)
 
 ---
 
