@@ -60,14 +60,14 @@
 
 ### 3단계 – AI 예측 모델 개발
 
-- [ ] 학습 데이터 분할 (train / validation / test)
-- [ ] 베이스라인 모델 구현 (이동평균 전략 등 룰 기반)
-- [ ] 머신러닝 모델 학습
+- [x] 학습 데이터 분할 (train / validation / test)
+- [x] 베이스라인 모델 구현 (이동평균 전략 등 룰 기반)
+- [x] 머신러닝 모델 학습
   - 시계열 예측: LSTM / Transformer
   - 분류/회귀: LightGBM, XGBoost
-- [ ] 모델 평가 지표 정의 (Sharpe ratio, MDD, 승률 등)
-- [ ] 모델 버전 관리 및 저장 (MLflow 또는 파일 기반)
-- [ ] 매수·매도 신호 생성 로직 구현
+- [x] 모델 평가 지표 정의 (Sharpe ratio, MDD, 승률 등)
+- [x] 모델 버전 관리 및 저장 (MLflow 또는 파일 기반)
+- [x] 매수·매도 신호 생성 로직 구현
 
 ---
 

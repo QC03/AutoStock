@@ -28,6 +28,12 @@ Thumbs.db
 # Local databases
 *.db
 
+# AI generated artifacts
+ai/models/artifacts/*
+!ai/models/artifacts/.gitkeep
+ai/signals/generated/*
+!ai/signals/generated/.gitkeep
+
 # Coverage
 .coverage
 htmlcov/
