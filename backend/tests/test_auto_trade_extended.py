@@ -77,6 +77,7 @@ def test_auto_trade_config_and_activity() -> None:
         assert activity.json()["enabled"] is True
         assert activity.json()["running"] is True
         assert activity.json()["strategy"] == "momentum"
+        assert isinstance(activity.json().get("recent_logs"), list)
 
         turn_off = client.post("/trading/auto-trade", json={"enabled": False}, headers=headers)
         assert turn_off.status_code == 200

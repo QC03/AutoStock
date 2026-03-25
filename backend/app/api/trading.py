@@ -83,6 +83,7 @@ def get_auto_trade_activity(
         last_symbol=activity["last_symbol"],
         last_signal=activity["last_signal"],
         last_message=activity["last_message"],
+        recent_logs=activity.get("recent_logs", []),
     )
 
 

@@ -1,7 +1,12 @@
 from __future__ import annotations
 
+import time
+
 from fastapi import FastAPI
+from fastapi import Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import Response
+from prometheus_client import CONTENT_TYPE_LATEST, Counter, Histogram, generate_latest
 
 from app.api import api_router
 from app.core.config import settings
@@ -22,6 +27,30 @@ app.add_middleware(
 )
 app.include_router(api_router)
 
+REQUEST_COUNT = Counter(
+    "autostock_http_requests_total",
+    "Total HTTP requests",
+    ["method", "path", "status"],
+)
+REQUEST_LATENCY = Histogram(
+    "autostock_http_request_duration_seconds",
+    "HTTP request duration in seconds",
+    ["method", "path"],
+)
+
+
+@app.middleware("http")
+async def metrics_middleware(request: Request, call_next):
+    start = time.perf_counter()
+    response = await call_next(request)
+    elapsed = time.perf_counter() - start
+    path = request.url.path
+    method = request.method
+    status = str(response.status_code)
+    REQUEST_COUNT.labels(method=method, path=path, status=status).inc()
+    REQUEST_LATENCY.labels(method=method, path=path).observe(elapsed)
+    return response
+
 
 @app.on_event("startup")
 def startup_event() -> None:
@@ -36,3 +65,8 @@ def shutdown_event() -> None:
 @app.get("/health")
 def health() -> dict[str, str]:
     return {"status": "ok"}
+
+
+@app.get("/metrics")
+def metrics() -> Response:
+    return Response(content=generate_latest(), media_type=CONTENT_TYPE_LATEST)

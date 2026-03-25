@@ -47,6 +47,14 @@ class AutoTradeConfigResponse(BaseModel):
     max_loss_pct: float
 
 
+class AutoTradeLogEntry(BaseModel):
+    ran_at: str
+    symbol: str
+    signal: str
+    action: str
+    message: str
+
+
 class AutoTradeActivityResponse(BaseModel):
     enabled: bool
     running: bool
@@ -60,3 +68,4 @@ class AutoTradeActivityResponse(BaseModel):
     last_symbol: str | None = None
     last_signal: str | None = None
     last_message: str | None = None
+    recent_logs: list[AutoTradeLogEntry] = []

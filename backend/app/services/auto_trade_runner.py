@@ -103,9 +103,24 @@ class AutoTradeRunner:
         self._last_signal_by_user_symbol: dict[tuple[int, str], str] = {}
         self._user_config: dict[int, dict[str, object]] = {}
         self._user_activity: dict[int, dict[str, object | None]] = {}
+        self._user_recent_logs: dict[int, list[dict[str, str]]] = {}
         self._next_run_at: dict[int, float] = {}
         self._enabled_state: dict[int, bool] = {}
         self._lock = threading.Lock()
+
+    def _append_user_log(self, user_id: int, symbol: str, signal: str, action: str, message: str) -> None:
+        logs = self._user_recent_logs.setdefault(user_id, [])
+        logs.insert(
+            0,
+            {
+                "ran_at": _utc_now_iso(),
+                "symbol": symbol,
+                "signal": signal,
+                "action": action,
+                "message": message,
+            },
+        )
+        self._user_recent_logs[user_id] = logs[:10]
 
     def get_user_config(self, user_id: int) -> dict[str, object]:
         with self._lock:
@@ -134,6 +149,13 @@ class AutoTradeRunner:
             self._user_activity[user_id]["last_action"] = "ON" if enabled else "OFF"
             self._user_activity[user_id]["last_message"] = "자동매매 시작" if enabled else "자동매매 중지"
             self._user_activity[user_id]["last_run_at"] = _utc_now_iso()
+            self._append_user_log(
+                user_id=user_id,
+                symbol="-",
+                signal="-",
+                action="ON" if enabled else "OFF",
+                message="자동매매 시작" if enabled else "자동매매 중지",
+            )
             if enabled:
                 self._next_run_at[user_id] = 0.0
                 for key in list(self._last_signal_by_user_symbol.keys()):
@@ -155,6 +177,7 @@ class AutoTradeRunner:
                 activity["next_run_in_seconds"] = remaining
             else:
                 activity["next_run_in_seconds"] = None
+            activity["recent_logs"] = list(self._user_recent_logs.get(user_id, []))
             return activity
 
     def start(self) -> None:
@@ -225,6 +248,13 @@ class AutoTradeRunner:
                             self._user_activity[user_id]["last_signal"] = signal
                             self._user_activity[user_id]["last_action"] = "HOLD"
                             self._user_activity[user_id]["last_message"] = f"{symbol} HOLD"
+                            self._append_user_log(
+                                user_id=user_id,
+                                symbol=symbol,
+                                signal=signal,
+                                action="HOLD",
+                                message=f"{symbol} HOLD",
+                            )
                         continue
 
                     side = OrderSide.BUY if signal == "BUY" else OrderSide.SELL
@@ -243,6 +273,13 @@ class AutoTradeRunner:
                             self._user_activity[user_id]["last_signal"] = signal
                             self._user_activity[user_id]["last_action"] = "REJECTED"
                             self._user_activity[user_id]["last_message"] = f"{symbol} 주문 실패: {error}"
+                            self._append_user_log(
+                                user_id=user_id,
+                                symbol=symbol,
+                                signal=signal,
+                                action="REJECTED",
+                                message=f"{symbol} 주문 실패: {error}",
+                            )
                         continue
 
                     order = TradeOrder(
@@ -262,6 +299,13 @@ class AutoTradeRunner:
                         self._user_activity[user_id]["last_signal"] = signal
                         self._user_activity[user_id]["last_action"] = result.side.value
                         self._user_activity[user_id]["last_message"] = f"{symbol} {result.side.value} {result.quantity}주"
+                        self._append_user_log(
+                            user_id=user_id,
+                            symbol=symbol,
+                            signal=signal,
+                            action=result.side.value,
+                            message=f"{symbol} {result.side.value} {result.quantity}주",
+                        )
 
             db.commit()
         finally:

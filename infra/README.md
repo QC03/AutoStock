@@ -7,6 +7,18 @@
 - `scripts/run_stage7_perf.py`: 핵심 API 지연시간 측정
 - `nginx`: 리버스 프록시 설정 파일 위치
 
+## 8단계 운영 배포 구성
+
+- `docker-compose.prod.yml`: 운영 배포용 스택
+- `.env.production.example`: 운영 환경변수 샘플
+- `nginx/autostock.prod.conf`: HTTPS + API/WS 프록시
+- `prometheus/prometheus.yml`: 기본 모니터링 스택 설정
+- `grafana/provisioning/*`: 데이터소스/대시보드 자동 로딩
+- `scripts/deploy_stage8.sh`: 운영 재배포 + 마이그레이션
+- `scripts/migrate_prod.sh`: alembic 운영 마이그레이션
+
+상세 가이드는 `../docs/STAGE8_DEPLOYMENT.md`를 참고하세요.
+
 ## 7단계 실행 방법
 
 ```powershell

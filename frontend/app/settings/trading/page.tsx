@@ -201,6 +201,25 @@ export default function TradingSettingsPage() {
         <p>최근 메시지: {activityQuery.data?.last_message ?? "-"}</p>
       </div>
 
+      <div className="rounded-md border border-slate-200 p-3 text-sm space-y-2">
+        <p className="font-medium">최근 자동매매 로그 (최대 10개)</p>
+        {activityQuery.data?.recent_logs && activityQuery.data.recent_logs.length > 0 ? (
+          <div className="max-h-56 overflow-auto space-y-1">
+            {activityQuery.data.recent_logs.map((log, index) => (
+              <div key={`${log.ran_at}-${log.symbol}-${index}`} className="rounded border border-slate-100 px-2 py-1">
+                <p className="text-xs text-slate-500">{new Date(log.ran_at).toLocaleString()}</p>
+                <p className="text-xs">
+                  [{log.action}] {log.symbol} / 신호 {log.signal}
+                </p>
+                <p className="text-xs text-slate-600">{log.message}</p>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className="text-xs text-slate-500">아직 기록된 자동매매 로그가 없습니다.</p>
+        )}
+      </div>
+
       <div>
         <label className="mb-1 block text-sm">전략</label>
         <select

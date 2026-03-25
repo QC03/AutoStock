@@ -108,6 +108,13 @@ export const tradingApi = {
       last_symbol?: string | null;
       last_signal?: string | null;
       last_message?: string | null;
+      recent_logs?: Array<{
+        ran_at: string;
+        symbol: string;
+        signal: string;
+        action: string;
+        message: string;
+      }>;
     };
   },
   toggleAutoTrade: async (token: string | null, enabled: boolean) => {
