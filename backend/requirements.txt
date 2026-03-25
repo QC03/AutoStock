@@ -1,2 +1,3 @@
 pytest>=8.2.0
 yfinance>=0.2.43
+celery>=5.4.0
