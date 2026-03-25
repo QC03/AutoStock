@@ -23,7 +23,7 @@
 
 ### 마일스톤 게이트
 
-- [ ] **M1 (2주차)**: 저장소 구조/개발환경/브랜치 전략 확정
+- [x] **M1 (2주차)**: 저장소 구조/개발환경/브랜치 전략 확정
 - [ ] **M2 (4주차)**: 데이터 파이프라인 1차 완료
 - [ ] **M3 (8주차)**: 모의 자동매매 엔진 MVP 완료
 - [ ] **M4 (12주차)**: 사용자 화면 + API 연동 MVP 완료
@@ -32,16 +32,16 @@
 
 ### 1단계 – 환경 설정 및 기술 스택 선정
 
-- [ ] 프로젝트 디렉터리 구조 설계 (frontend / backend / ai / infra)
-- [ ] 기술 스택 확정
+- [x] 프로젝트 디렉터리 구조 설계 (frontend / backend / ai / infra)
+- [x] 기술 스택 확정
   - **Frontend**: React (Next.js) + TypeScript
   - **Backend**: FastAPI (Python)
   - **AI/ML**: Python (scikit-learn, LightGBM, PyTorch 등)
   - **Database**: PostgreSQL (운영) + SQLite (로컬 테스트)
   - **Task Queue**: Celery + Redis (자동매매 스케줄링)
   - **Container**: Docker / Docker Compose
-- [ ] 로컬 개발 환경 세팅 (Python venv, Node.js, Docker Compose)
-- [ ] GitHub 저장소 브랜치 전략 수립 (`main` / `develop` / `feature/*`)
+- [x] 로컬 개발 환경 세팅 (Python venv, Node.js, Docker Compose)
+- [x] GitHub 저장소 브랜치 전략 수립 (`main` / `develop` / `feature/*`)
 
 ---
 
