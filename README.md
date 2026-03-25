@@ -99,16 +99,16 @@
 
 ### 6단계 – 프론트엔드 구현
 
-- [ ] Next.js 프로젝트 초기화
-- [ ] 페이지 구성
+- [x] Next.js 프로젝트 초기화
+- [x] 페이지 구성
   - 로그인 / 회원가입 페이지
   - 대시보드 (포트폴리오 현황, 수익률 그래프)
   - 종목 상세 페이지 (차트, AI 예측 신호)
   - 매매 설정 페이지 (자동매매 전략 선택·파라미터 조정)
   - 매매 내역 페이지
-- [ ] 실시간 시세 차트 컴포넌트 (TradingView Lightweight Charts 또는 Recharts)
-- [ ] API 연동 (Axios / React Query)
-- [ ] 반응형 UI 구현 (Tailwind CSS)
+- [x] 실시간 시세 차트 컴포넌트 (TradingView Lightweight Charts 또는 Recharts)
+- [x] API 연동 (Axios / React Query)
+- [x] 반응형 UI 구현 (Tailwind CSS)
 
 ---
 
