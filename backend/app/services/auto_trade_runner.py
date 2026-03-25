@@ -134,7 +134,12 @@ class AutoTradeRunner:
             self._user_activity[user_id]["last_action"] = "ON" if enabled else "OFF"
             self._user_activity[user_id]["last_message"] = "자동매매 시작" if enabled else "자동매매 중지"
             self._user_activity[user_id]["last_run_at"] = _utc_now_iso()
-            if not enabled:
+            if enabled:
+                self._next_run_at[user_id] = 0.0
+                for key in list(self._last_signal_by_user_symbol.keys()):
+                    if key[0] == user_id:
+                        del self._last_signal_by_user_symbol[key]
+            else:
                 self._next_run_at[user_id] = 0.0
 
     def get_user_activity(self, user_id: int) -> dict[str, object | None]:
@@ -142,7 +147,14 @@ class AutoTradeRunner:
             if user_id not in self._user_activity:
                 self._user_activity[user_id] = _default_activity()
             activity = dict(self._user_activity[user_id])
-            activity["running"] = bool(self._enabled_state.get(user_id, False))
+            enabled = bool(self._enabled_state.get(user_id, False))
+            activity["running"] = enabled
+            next_run_at = self._next_run_at.get(user_id, 0.0)
+            if enabled and next_run_at > 0:
+                remaining = int(max(0, next_run_at - time.time()))
+                activity["next_run_in_seconds"] = remaining
+            else:
+                activity["next_run_in_seconds"] = None
             return activity
 
     def start(self) -> None:

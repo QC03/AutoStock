@@ -54,6 +54,7 @@ class AutoTradeActivityResponse(BaseModel):
     symbols: list[str]
     quantity: int
     interval_seconds: int
+    next_run_in_seconds: int | None = None
     last_run_at: str | None = None
     last_action: str | None = None
     last_symbol: str | None = None

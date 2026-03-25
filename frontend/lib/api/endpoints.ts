@@ -102,6 +102,7 @@ export const tradingApi = {
       symbols: string[];
       quantity: number;
       interval_seconds: number;
+      next_run_in_seconds?: number | null;
       last_run_at?: string | null;
       last_action?: string | null;
       last_symbol?: string | null;

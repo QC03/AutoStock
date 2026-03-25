@@ -190,6 +190,11 @@ export default function TradingSettingsPage() {
       <div className="rounded-md border border-slate-200 p-3 text-sm space-y-1">
         <p className="font-medium">AI 현재 작업</p>
         <p>실행 중: {activityQuery.data?.running ? "예" : "아니오"}</p>
+        <p>
+          다음 실행: {activityQuery.data?.next_run_in_seconds === undefined || activityQuery.data?.next_run_in_seconds === null
+            ? "-"
+            : `${activityQuery.data.next_run_in_seconds}초 후`}
+        </p>
         <p>최근 실행: {activityQuery.data?.last_run_at ? new Date(activityQuery.data.last_run_at).toLocaleString() : "-"}</p>
         <p>최근 액션: {activityQuery.data?.last_action ?? "-"}</p>
         <p>최근 종목/신호: {activityQuery.data?.last_symbol ?? "-"} / {activityQuery.data?.last_signal ?? "-"}</p>

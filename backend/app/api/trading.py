@@ -77,6 +77,7 @@ def get_auto_trade_activity(
         symbols=config["symbols"],
         quantity=config["quantity"],
         interval_seconds=config["interval_seconds"],
+        next_run_in_seconds=activity.get("next_run_in_seconds"),
         last_run_at=activity["last_run_at"],
         last_action=activity["last_action"],
         last_symbol=activity["last_symbol"],

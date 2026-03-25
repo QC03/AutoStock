@@ -29,11 +29,32 @@ type StockAccordionBlockProps = {
   isRemovable: boolean;
 };
 
+function useLivePrice(symbol: string, fallbackPrice?: number) {
+  const [livePrice, setLivePrice] = useState<number | null>(null);
+
+  useEffect(() => {
+    const baseWs = (process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8000").replace("http", "ws");
+    const socket = new WebSocket(`${baseWs}/ws/quotes/${symbol}`);
+
+    socket.onmessage = (event) => {
+      const payload = JSON.parse(event.data) as { price?: number; error?: string };
+      if (payload.error || payload.price === undefined) return;
+      setLivePrice(payload.price);
+    };
+
+    return () => socket.close();
+  }, [symbol]);
+
+  return livePrice ?? fallbackPrice;
+}
+
 function StockAccordionBlock({ symbol, expanded, onToggle, onRemove, isRemovable }: StockAccordionBlockProps) {
   const quoteQuery = useQuery({
     queryKey: ["quote", symbol],
     queryFn: () => dataApi.quote(symbol),
   });
+
+  const currentPrice = useLivePrice(symbol, quoteQuery.data?.price);
 
   const indicatorQuery = useQuery({
     queryKey: ["indicators", symbol],
@@ -53,7 +74,7 @@ function StockAccordionBlock({ symbol, expanded, onToggle, onRemove, isRemovable
           <div>
             <p className="text-base font-semibold text-slate-900">{symbol}</p>
             <p className="text-xs text-slate-500">
-              현재가: {quoteQuery.isLoading ? "로딩 중..." : `$${quoteQuery.data?.price.toFixed(2) ?? "-"}`}
+              현재가: {currentPrice === undefined ? (quoteQuery.isLoading ? "로딩 중..." : "-") : `$${currentPrice.toFixed(2)}`}
             </p>
           </div>
           <span className="text-sm text-slate-500">{expanded ? "▲" : "▼"}</span>
