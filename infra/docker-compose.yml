@@ -1,0 +1,88 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: autostock-db
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-autostock}
+      POSTGRES_USER: ${POSTGRES_USER:-autostock}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-autostock}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-autostock} -d ${POSTGRES_DB:-autostock}"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  redis:
+    image: redis:7-alpine
+    container_name: autostock-redis
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  backend:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+    container_name: autostock-backend
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      AUTOSTOCK_DATABASE_URL: postgresql+psycopg2://${POSTGRES_USER:-autostock}:${POSTGRES_PASSWORD:-autostock}@db:5432/${POSTGRES_DB:-autostock}
+      AUTOSTOCK_JWT_SECRET: ${AUTOSTOCK_JWT_SECRET:-autostock-dev-secret-key-at-least-32-bytes}
+      AUTOSTOCK_CORS_ORIGINS: ${AUTOSTOCK_CORS_ORIGINS:-http://localhost:3000}
+      CELERY_BROKER_URL: redis://redis:6379/0
+      CELERY_RESULT_BACKEND: redis://redis:6379/1
+    ports:
+      - "8000:8000"
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8000/health', timeout=3)\""]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+
+  celery-worker:
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
+    container_name: autostock-celery-worker
+    command: ["celery", "-A", "app.services.trading_scheduler.celery_app", "worker", "--loglevel=INFO"]
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      backend:
+        condition: service_healthy
+    environment:
+      AUTOSTOCK_DATABASE_URL: postgresql+psycopg2://${POSTGRES_USER:-autostock}:${POSTGRES_PASSWORD:-autostock}@db:5432/${POSTGRES_DB:-autostock}
+      AUTOSTOCK_JWT_SECRET: ${AUTOSTOCK_JWT_SECRET:-autostock-dev-secret-key-at-least-32-bytes}
+      AUTOSTOCK_CORS_ORIGINS: ${AUTOSTOCK_CORS_ORIGINS:-http://localhost:3000}
+      CELERY_BROKER_URL: redis://redis:6379/0
+      CELERY_RESULT_BACKEND: redis://redis:6379/1
+
+  frontend:
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile
+    container_name: autostock-frontend
+    depends_on:
+      backend:
+        condition: service_healthy
+    environment:
+      NEXT_PUBLIC_API_BASE_URL: http://localhost:8000
+    ports:
+      - "3000:3000"
+
+volumes:
+  postgres_data:
